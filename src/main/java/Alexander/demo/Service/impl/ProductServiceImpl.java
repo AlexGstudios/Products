@@ -1,6 +1,7 @@
 package Alexander.demo.Service.impl;
 
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import Alexander.demo.SharedDto.ProductDto;
 import Alexander.demo.Model.Entity.ProductEntity;
@@ -11,7 +12,6 @@ import Alexander.demo.Service.FilterUtil.Filter;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -24,10 +24,26 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto[] getAllProducts(){
-        
-        ProductDto[] proDtoAll = new ProductDto[(int) ];
 
-        return proDtoAll;
+        Iterable<ProductEntity> allProducts = productRepo.findAll();
+
+        int arraySize = (int) StreamSupport.stream(allProducts.spliterator(), false).count();
+
+        ProductDto[] productArr = new ProductDto[arraySize];
+
+        int i = 0;
+        for(ProductEntity proEnt : allProducts){
+
+            ProductDto proDto = new ProductDto();
+
+            BeanUtils.copyProperties(proEnt, proDto);
+
+            productArr[i] = proDto;
+
+            i++;
+        }
+
+        return productArr;
     }
 
     @Override

@@ -25,9 +25,25 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping
-    public ProductDto[] getAllProducts(){
-        return ProductDto[] x = new ProductDto[];
-    }
+    public ProductResponseModel[] getAllProducts(){
+
+        ProductDto[] proDtoArr = productService.getAllProducts();
+        ProductResponseModel[] allProducts = new ProductResponseModel[proDtoArr.length];
+
+        int i = 0;
+        while(i < proDtoArr.length){
+
+            ProductResponseModel response = new ProductResponseModel();
+
+            BeanUtils.copyProperties(proDtoArr[i], response);
+
+            allProducts[i] = response;
+
+            i++;
+        }
+
+        return allProducts;
+}
 
     @GetMapping(value="/{productId}")
     public ProductResponseModel getProduct(@PathVariable String productId){
