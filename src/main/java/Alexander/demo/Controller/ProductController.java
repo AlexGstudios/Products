@@ -1,7 +1,8 @@
 package Alexander.demo.Controller;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,11 +22,15 @@ import Alexander.demo.Model.Response.ProductResponseModel;
 @RequestMapping("product")
 public class ProductController {
     
-    @Autowired
-    ProductService productService;
+    private final ProductService productService;
+
+    public ProductController(ProductService productService){
+
+        this.productService = productService;
+    }
 
     @GetMapping
-    public ProductResponseModel[] getAllProducts(){
+    public ResponseEntity<ProductResponseModel[]> getAllProducts(){
 
         ProductDto[] proDtoArr = productService.getAllProducts();
         ProductResponseModel[] allProducts = new ProductResponseModel[proDtoArr.length];
@@ -42,11 +47,11 @@ public class ProductController {
             i++;
         }
 
-        return allProducts;
+        return new ResponseEntity<>(allProducts, HttpStatus.OK);
 }
 
     @GetMapping(value="/{productId}")
-    public ProductResponseModel getProduct(@PathVariable String productId){
+    public ResponseEntity<ProductResponseModel> getProduct(@PathVariable String productId){
 
         ProductDto proDtoIn = new ProductDto();
         proDtoIn.setProductId(productId);
@@ -56,11 +61,11 @@ public class ProductController {
         ProductResponseModel response = new ProductResponseModel();
         BeanUtils.copyProperties(proDtoFind, response);
 
-        return response;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping
-    public ProductResponseModel createProduct(@RequestBody ProductRequestModel productDetails){
+    public ResponseEntity<ProductResponseModel> createProduct(@RequestBody ProductRequestModel productDetails){
         
         ProductDto productDto = new ProductDto();
         BeanUtils.copyProperties(productDetails, productDto);
@@ -70,11 +75,11 @@ public class ProductController {
         ProductResponseModel response = new ProductResponseModel();
         BeanUtils.copyProperties(productDtoServ, response);
 
-        return response;
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping(value="/{productId}")
-    public ProductResponseModel updateProduct(@PathVariable String productId, @RequestBody ProductRequestModel productDetails){
+    public ResponseEntity<ProductResponseModel> updateProduct(@PathVariable String productId, @RequestBody ProductRequestModel productDetails){
         
         ProductDto productDtoId = new ProductDto();
         productDtoId.setProductId(productId);
@@ -86,11 +91,11 @@ public class ProductController {
         ProductResponseModel response = new ProductResponseModel();
         BeanUtils.copyProperties(productDtoServ, response);
 
-        return response;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }    
 
     @DeleteMapping(value="/{productId}")
-    public ProductResponseModel deleteProduct(@PathVariable String productId){
+    public ResponseEntity<ProductResponseModel> deleteProduct(@PathVariable String productId){
         
         ProductDto proDtoId = new ProductDto();
         proDtoId.setProductId(productId);
@@ -102,6 +107,6 @@ public class ProductController {
         ProductResponseModel response = new ProductResponseModel();
         BeanUtils.copyProperties(proDtoDel, response);
 
-        return response;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

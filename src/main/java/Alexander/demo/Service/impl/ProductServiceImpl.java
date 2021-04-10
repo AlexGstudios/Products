@@ -11,7 +11,9 @@ import Alexander.demo.Service.ProductService;
 import Alexander.demo.Service.FilterUtil.Filter;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -51,6 +53,11 @@ public class ProductServiceImpl implements ProductService {
         
         Optional<ProductEntity> productFind = productRepo.findByProductId(productDetailsIn.getProductId());
 
+        if(productFind.isEmpty()){
+            
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wrong ID: " + productDetailsIn.getProductId());
+        }
+
         ProductDto proDtoFind = new ProductDto();
         BeanUtils.copyProperties(productFind.get(), proDtoFind);
 
@@ -59,6 +66,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto createProduct(ProductDto productDetailsIn) {
+
+        if(productDetailsIn.getName() == null){
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product needs a name");
+        }
 
         ProductEntity proEnt = new ProductEntity();
         BeanUtils.copyProperties(productDetailsIn, proEnt);
